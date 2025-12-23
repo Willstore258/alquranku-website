@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlQuranKu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('https://files.catbox.moe/crbh5z.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .search-bar {
+            margin: 20px 0;
+        }
+        .content {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #000;
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 400px;
+        }
+        .surah-list, .juz-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .surah-item, .juz-item {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .surah-item:hover, .juz-item:hover {
+            background-color: #e9ecef;
+        }
+        .niat-list, .wirid-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .niat-item, .wirid-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            text-align: right; /* Untuk teks Arab */
+            direction: rtl; /* Arah kanan ke kiri untuk Arab */
+            font-family: 'Amiri', serif; /* Font untuk Arab */
+        }
+        .ayat-text {
+            font-family: 'Amiri', serif; /* Font untuk teks Arab */
+            text-align: right;
+            direction: rtl;
+            font-size: 1.2em;
+        }
+    </style>
+    <!-- Tambahkan font Arab -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand text-white" href="#">AlQuranKu</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#" onclick="showSection('surah')">Surah</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#" onclick="showSection('juz')">Juz</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#" onclick="showSection('wirid')">Bacaan Wirid</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#" onclick="showSection('niat')">Bacaan Niat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#" onclick="openWhatsApp()">Wa Customer AlQuranKu</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" class="form-control" placeholder="Cari Surah, Juz, dll..." onkeyup="searchContent()">
+        </div>
+
+        <div id="content" class="content">
+            <!-- Default content or welcome message -->
+            <h2>Selamat Datang di AlQuranKu</h2>
+            <p>Pilih menu di atas untuk mulai menjelajahi Al-Quran.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const apiBase = 'https://api.alquran.cloud/v1';
+
+        function showSection(section) {
+            const content = document.getElementById('content');
+            if (section === 'surah') {
+                fetchSurah();
+            } else if (section === 'juz') {
+                fetchJuz();
+            } else if (section === 'wirid') {
+                content.innerHTML = `
+                    <h2>Bacaan Wirid</h2>
+                    <ul class="wirid-list">
+                        <li class="wirid-item"><strong>سُبْحَانَ اللَّهِ</strong> (33x)</li>
+                        <li class="wirid-item"><strong>الحَمْدُ لِلَّهِ</strong> (33x)</li>
+                        <li class="wirid-item"><strong>اللَّهُ أَكْبَرُ</strong> (33x)</li>
+                        <li class="wirid-item"><strong>لا إِلَهَ إِلا اللَّهُ</strong> (1x)</li>
+                        <!-- Tambahkan lebih banyak jika diperlukan -->
+                    </ul>
+                `;
+            } else if (section === 'niat') {
+                content.innerHTML = `
+                    <h2>Bacaan Niat</h2>
+                    <ul class="niat-list">
+                        <li class="niat-item"><strong>Niat Sholat Subuh:</strong> أُصَلِّي فَرْضَ الصُّبْحِ رَكْعَتَيْنِ مُسْتَقْبِلَ الْقِبْلَةِ أَدَاءً لِلَّهِ تَعَالَى</li>
+                        <li class="niat-item"><strong>Niat Sholat Dzuhur:</strong> أُصَلِّي فَرْضَ الظُّهْرِ أَرْبَعَ رَكْعَاتٍ مُسْتَقْبِلَ الْقِبْلَةِ أَدَاءً لِلَّهِ تَعَالَى</li>
+                        <li class="niat-item"><strong>Niat Sholat Ashar:</strong> أُصَلِّي فَرْضَ العَصْرِ أَرْبَعَ رَكْعَاتٍ مُسْتَقْبِلَ الْقِبْلَةِ أَدَاءً لِلَّهِ تَعَالَى</li>
+                        <li class="niat-item"><strong>Niat Sholat Maghrib:</strong> أُصَلِّي فَرْضَ المَغْرِبِ ثَلَاثَ رَكْعَاتٍ مُسْتَقْبِلَ الْقِبْلَةِ أَدَاءً لِلَّهِ تَعَالَى</li>
+                        <li class="niat-item"><strong>Niat Sholat Isya:</strong> أُصَلِّي فَرْضَ العِشَاءِ أَرْبَعَ رَكْعَاتٍ مُسْتَقْبِلَ الْقِبْلَةِ أَدَاءً لِلَّهِ تَعَالَى</li>
+                        <li class="niat-item"><strong>Niat Puasa:</strong> نَوَيْتُ صَوْمَ غَدٍ عَنْ أَدَاءِ فَرْضِ شَهْرِ رَمَضَانَ هَذِهِ السَّنَةِ لِلَّهِ تَعَالَى</li>
+                        <li class="niat-item"><strong>Niat Sholat Tarawih:</strong>أُصَلِّي سُنَّةَ التَّرَاوِيْحِ رَكْعَتَيْنِ لِلّٰهِ تَعَالَى</li>
+                        <li class="niat-item"><strong>Niat Sholat Witir 1:</strong>أُصَلِّي سُنَّةَ الْوِتْرِ رَكْعَةً لِلّٰهِ تَعَالَى</li>
+                       <li class="niat-item"><strong>Niat Idul Fitri:</strong>أُصَلِّي سُنَّةَ عِيدِ الْفِطْرِ رَكْعَتَيْنِ لِلّٰهِ تَعَالَى</li>
+                       <li class="niat-item"><strong>Niat Sholat Witir 2:</strong>أُصَلِّي سُنَّةَ الْوِتْرِ رَكْعَتَيْنِ لِلّٰهِ تَعَالَى</li>
+                       <li class="niat-item"><strong>Niat Idul Adha:</strong>أُصَلِّي سُنَّةَ عِيدِ الْأَضْحَى رَكْعَتَيْنِ لِلّٰهِ تَعَالَى</li>
+                       <!-- Tambahkan lebih banyak niat sesuai kebutuhan -->
+                    </ul>
+                `;
+            }
+        }
+
+        async function fetchSurah() {
+            try {
+                const response = await fetch(`${apiBase}/surah`);
+                const data = await response.json();
+                const content = document.getElementById('content');
+                content.innerHTML = '<h2>Daftar Surah</h2><div class="surah-list"></div>';
+                const list = content.querySelector('.surah-list');
+                data.data.forEach(surah => {
+                    const item = document.createElement('div');
+                    item.className = 'surah-item';
+                    item.innerHTML = `<h5>${surah.englishName}</h5><small>${surah.numberOfAyahs} ayat</small>`;
+                    item.onclick = () => showSurahDetail(surah.number);
+                    list.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Error fetching surah:', error);
+            }
+        }
+
+        async function fetchJuz() {
+            try {
+                const content = document.getElementById('content');
+                content.innerHTML = '<h2>Daftar Juz</h2><div class="juz-list"></div>';
+                const list = content.querySelector('.juz-list');
+                for (let i = 1; i <= 30; i++) {
+                    const item = document.createElement('div');
+                    item.className = 'juz-item';
+                    item.innerHTML = `<h5>Juz ${i}</h5>`;
+                    item.onclick = () => showJuzDetail(i);
+                    list.appendChild(item);
+                }
+            } catch (error) {
+                console.error('Error fetching juz:', error);
+            }
+        }
+
+        async function showSurahDetail(nomor) {
+            try {
+                const response = await fetch(`${apiBase}/surah/${nomor}`);
+                const data = await response.json();
+                const content = document.getElementById('content');
+                content.innerHTML = `<h2>${data.data.englishName}</h2>`;
+                data.data.ayahs.forEach(ayah => {
+                    content.innerHTML += `<p class="ayat-text">${ayah.numberInSurah}. ${ayah.text}</p>`;
+                });
+            } catch (error) {
+                console.error('Error fetching surah detail:', error);
+            }
+        }
+
+        async function showJuzDetail(juz) {
+            try {
+                const response = await fetch(`${apiBase}/juz/${juz}`);
+                const data = await response.json();
+                const content = document.getElementById('content');
+                content.innerHTML = `<h2>Juz ${juz}</h2>`;
+                data.data.ayahs.forEach(ayah => {
+                    content.innerHTML += `<p class="ayat-text">${ayah.surah.englishName}:${ayah.numberInSurah}. ${ayah.text}</p>`;
+                });
+            } catch (error) {
+                console.error('Error fetching juz detail:', error);
+            }
+        }
+
+        function searchContent() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            // Implementasi pencarian sederhana, bisa diperluas
+            if (query.includes('surah')) {
+                showSection('surah');
+            } else if (query.includes('juz')) {
+                showSection('juz');
+            } else if (query.includes('wirid')) {
+                showSection('wirid');
+            } else if (query.includes('niat')) {
+                showSection('niat');
+            }
+        }
+
+        function openWhatsApp() {
+            window.open('https://wa.me/6285800114299', '_blank');
+        }
+    </script>
+</body>
+</html>
